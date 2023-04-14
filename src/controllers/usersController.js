@@ -35,8 +35,6 @@ const usersController = {
         try {
         const [rows] = await pool.query('INSERT INTO users(rol_id, name, lastname, email, password, image) VALUES (?, ?, ?, ?, ?, ?)', [rol_id, name, lastname, email, password, image] )
 
-        console.log(rows);
-
         res.send({ 
             id: rows.insertId,
             rol_id,
