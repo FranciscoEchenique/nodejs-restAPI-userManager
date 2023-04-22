@@ -23,11 +23,12 @@ const authController = {
 
            await pool.query('UPDATE users SET rol_id = IFNULL(?, rol_id), name = IFNULL(?, name), lastname = IFNULL(?, lastname), email = IFNULL(?, email), password = IFNULL(?, password), image = IFNULL(?, image) WHERE email = ?', [rol_id, name, lastname, email, passWordToCompare, image, email]);
 
-           rows = await pool.query('SELECT * FROM users WHERE email = ?', [email]);
-
+           [rows] = await pool.query('SELECT * FROM users WHERE email = ?', [email]);
         }
 
-        const matchPassword = bcrypt.compareSync(passWordToCompare, rows[0].password);
+        const matchPassword = bcrypt.compareSync(password, rows[0].password);
+
+        console.log(matchPassword);
 
         if (!matchPassword) return res.status(401).json({ token: null, message: 'Invalid password' });
 
