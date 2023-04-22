@@ -1,4 +1,7 @@
 import { pool } from '../db.js'
+import bcrypts from 'bcryptjs';
+import jwt from 'jsonwebtoken';
+import { SECRET_KEY } from '../config.js'
 
 const usersController = {
     getUser: async (req, res) => {
@@ -32,18 +35,17 @@ const usersController = {
     },
     postUser: async (req, res) => {
         const { rol_id, name, lastname, email, password, image } = req.body
-        try {
-        const [rows] = await pool.query('INSERT INTO users(rol_id, name, lastname, email, password, image) VALUES (?, ?, ?, ?, ?, ?)', [rol_id, name, lastname, email, password, image] )
+        const hashedPassword = bcrypts.hashSync(password, 10);
 
-        res.send({ 
-            id: rows.insertId,
-            rol_id,
-            name,
-            lastname,
-            email,
-            password,
-            image
-         });
+        try {
+        const [rows] = await pool.query('INSERT INTO users(rol_id, name, lastname, email, password, image) VALUES (?, ?, ?, ?, ?, ?)', [rol_id ? rol_id : 2, name, lastname, email, hashedPassword, image] )
+
+        const token = jwt.sign({id: rows.insertId }, SECRET_KEY, { 
+            expiresIn: 86400 
+        })
+
+
+        res.status(200).json({ token })
         } catch (error) {
             res.status(500).json({
                 message: 'Something goes wrong'
