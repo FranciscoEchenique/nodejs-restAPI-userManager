@@ -4,9 +4,9 @@ import { verifyToken, isAdmin } from '../middlewares/authjwt.js';
 
 const router = express.Router();
 
-router.get('/', verifyToken, usersController.getUser);
+router.get('/', usersController.getUser);
 
-router.get('/:id', verifyToken, usersController.getUserById);
+router.get('/:id', usersController.getUserById);
 
 router.post('/', [verifyToken, isAdmin], usersController.postUser);
 
