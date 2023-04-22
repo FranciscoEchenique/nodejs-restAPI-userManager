@@ -7,11 +7,27 @@ const authController = {
     login: async (req, res) => {
         const { email, password } = req.body;
 
-        const [rows] = await pool.query('SELECT * FROM users WHERE email = ?', [email]);
+        let [rows] = await pool.query('SELECT * FROM users WHERE email = ?', [email]);
 
-        if (!rows[0]) return res.status(404).json({ message: 'User not found' });  
+        const rol_id = null;
+        const name = null;
+        const lastname = null;
+        const image = null;
 
-        const matchPassword = bcrypt.compareSync(password, rows[0].password);
+        if (!rows[0]) return res.status(404).json({ message: 'User not found' });
+
+        let passWordToCompare = password;
+
+        if(password === rows[0].password){
+           passWordToCompare = bcrypt.hashSync(password, 10);
+
+           await pool.query('UPDATE users SET rol_id = IFNULL(?, rol_id), name = IFNULL(?, name), lastname = IFNULL(?, lastname), email = IFNULL(?, email), password = IFNULL(?, password), image = IFNULL(?, image) WHERE email = ?', [rol_id, name, lastname, email, passWordToCompare, image, email]);
+
+           rows = await pool.query('SELECT * FROM users WHERE email = ?', [email]);
+
+        }
+
+        const matchPassword = bcrypt.compareSync(passWordToCompare, rows[0].password);
 
         if (!matchPassword) return res.status(401).json({ token: null, message: 'Invalid password' });
 
