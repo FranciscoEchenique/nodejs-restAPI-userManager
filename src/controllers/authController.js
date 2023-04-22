@@ -28,8 +28,6 @@ const authController = {
 
         const matchPassword = bcrypt.compareSync(password, rows[0].password);
 
-        console.log(matchPassword);
-
         if (!matchPassword) return res.status(401).json({ token: null, message: 'Invalid password' });
 
         const token = jwt.sign({ id: rows[0].id }, SECRET_KEY, {
